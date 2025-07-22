@@ -13,13 +13,23 @@ const initialState = {
   status: 'loading',
   index: 0,
   answer: null,
+  points: 0,
 };
 const reducer = function (state, action) {
   switch (action.type) {
     case 'dataReceived': return { ...state, questions: action.payload, status: 'ready', };
     case 'dataFailed': return { ...state, status: 'error' }
     case 'start': return { ...state, status: 'active' }
-    case 'newAnswer': return { ...state, answer: action.payload }
+    case 'newAnswer':
+      const currQuestion = state.questions[state.index];
+      const newPoints = state.points + (currQuestion.correctOption === action.payload
+        ? currQuestion.points
+        : 0);
+      return {
+        ...state,
+        answer: action.payload,
+        points: newPoints,
+      }
     default: throw new Error('action unknown')
   }
 
