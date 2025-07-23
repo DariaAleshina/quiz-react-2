@@ -8,6 +8,8 @@ import Question from './Question.js';
 import NextButton from './NextButton.js';
 import Progress from './Progress.js';
 import Finished from './Finished.js';
+import Footer from './Footer.js';
+import Timer from './Timer.js';
 
 const initialState = {
   questions: [],
@@ -18,6 +20,7 @@ const initialState = {
   answer: null,
   points: 0,
   highscore: 0,
+  secondsRemaining: 10,
 };
 const reducer = function (state, action) {
   switch (action.type) {
@@ -50,13 +53,19 @@ const reducer = function (state, action) {
       index: 0,
       answer: null,
       points: 0,
+      secondsRemaining: 10,
+    }
+    case 'tick': return {
+      ...state,
+      secondsRemaining: state.secondsRemaining--,
+      status: state.secondsRemaining === 0 ? 'finished' : state.status,
     }
     default: throw new Error('action unknown')
   }
 }
 
 export default function App() {
-  const [{ questions, status, index, answer, points, highscore }, dispatch] = useReducer(reducer, initialState);
+  const [{ questions, status, index, answer, points, highscore, secondsRemaining }, dispatch] = useReducer(reducer, initialState);
   const numQuestions = questions.length;
   const maxPoints = questions.reduce(((acc, question) => acc + question.points), 0);
 
@@ -82,7 +91,10 @@ export default function App() {
               dispatch={dispatch}
               answer={answer}
             />
-            <NextButton dispatch={dispatch} answer={answer} index={index} numQuestions={numQuestions} />
+            <Footer>
+              <Timer dispatch={dispatch} secondsRemaining={secondsRemaining} />
+              <NextButton dispatch={dispatch} answer={answer} index={index} numQuestions={numQuestions} />
+            </Footer>
           </>
         }
         {status === 'finished' && <Finished points={points} maxPoints={maxPoints} highscore={highscore} dispatch={dispatch} />}
