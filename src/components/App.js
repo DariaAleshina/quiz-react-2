@@ -11,6 +11,8 @@ import Finished from './Finished.js';
 import Footer from './Footer.js';
 import Timer from './Timer.js';
 
+const SECS_PER_QUESTION = 30;
+
 const initialState = {
   questions: [],
 
@@ -26,7 +28,7 @@ const reducer = function (state, action) {
   switch (action.type) {
     case 'dataReceived': return { ...state, questions: action.payload, status: 'ready', };
     case 'dataFailed': return { ...state, status: 'error' }
-    case 'start': return { ...state, status: 'active' }
+    case 'start': return { ...state, status: 'active', secondsRemaining: state.questions.length * SECS_PER_QUESTION }
     case 'newAnswer':
       const currQuestion = state.questions[state.index];
       const newPoints = state.points + (currQuestion.correctOption === action.payload
@@ -53,7 +55,7 @@ const reducer = function (state, action) {
       index: 0,
       answer: null,
       points: 0,
-      secondsRemaining: 10,
+      secondsRemaining: null,
     }
     case 'tick': return {
       ...state,
